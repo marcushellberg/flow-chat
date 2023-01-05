@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.messages.MessageInput;
 import com.vaadin.flow.component.messages.MessageList;
 import com.vaadin.flow.component.messages.MessageListItem;
@@ -23,24 +24,28 @@ import java.util.List;
 @PermitAll
 class ChatView extends VerticalLayout {
 
-    public ChatView(ChatService service) {
+    public ChatView(ChatService service, AuthenticationContext authContext) {
+
+        var logout = new Button("Log out", e -> authContext.logout());
         var list = new MessageList();
         var input = new MessageInput();
+        var ui = UI.getCurrent();
+
+        setSizeFull();
+        add(logout, list, input);
+        expand(list);
+        input.setWidthFull();
+        setAlignSelf(Alignment.END, logout);
 
         input.addSubmitListener(e -> {
             service.send(e.getValue(), SecurityContextHolder.getContext().getAuthentication().getName());
         });
 
-        var ui = UI.getCurrent();
         service.join().subscribe(message -> {
             var items = new ArrayList<>(list.getItems());
             items.add(new MessageListItem(message.message(), message.time(), message.userName()));
             ui.access(() -> list.setItems(items));
         });
 
-        setSizeFull();
-        add(list, input);
-        expand(list);
-        input.setWidthFull();
     }
 }
