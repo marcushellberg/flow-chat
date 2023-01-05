@@ -38,7 +38,7 @@ class ChatView extends VerticalLayout {
         setAlignSelf(Alignment.END, logout);
 
         input.addSubmitListener(e -> {
-            service.send(e.getValue(), SecurityContextHolder.getContext().getAuthentication().getName());
+            service.send(e.getValue(), authContext.getPrincipalName().orElse("Anonymous"));
         });
 
         service.join().subscribe(message -> {
