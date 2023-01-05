@@ -8,21 +8,27 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.spring.security.AuthenticationContext;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.context.event.EventListener;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
 @Route("")
+@PermitAll
 class ChatView extends VerticalLayout {
 
     public ChatView(ChatService service) {
         var list = new MessageList();
-        var userName = new TextField();
         var input = new MessageInput();
 
         input.addSubmitListener(e -> {
-            service.send(e.getValue(), userName.getValue());
+            service.send(e.getValue(), SecurityContextHolder.getContext().getAuthentication().getName());
         });
 
         var ui = UI.getCurrent();
@@ -32,15 +38,9 @@ class ChatView extends VerticalLayout {
             ui.access(() -> list.setItems(items));
         });
 
-
-        var inputLayout = new HorizontalLayout(userName, input);
-        inputLayout.setWidthFull();
-        inputLayout.setAlignItems(Alignment.BASELINE);
-        inputLayout.expand(input);
-        userName.setPlaceholder("Username");
-
         setSizeFull();
-        add(list, inputLayout);
+        add(list, input);
         expand(list);
+        input.setWidthFull();
     }
 }
