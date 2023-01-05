@@ -8,8 +8,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@Theme(variant = Lumo.DARK)
 @Push
+@Theme(variant = Lumo.DARK)
 public class DemoApplication implements AppShellConfigurator {
 
 	public static void main(String[] args) {
